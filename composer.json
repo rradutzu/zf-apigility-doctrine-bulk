@@ -16,7 +16,7 @@
         },
         "zf": {
             "module": [
-                "ZF\\Apigility\\Doctrine\\Bulk"
+                "ZF\\Apigility\\Doctrine\\Bulk\\"
             ]
         }
     },
@@ -26,7 +26,7 @@
     },
     "autoload": {
         "psr-4": {
-            "ZF\\Apigility\\Doctrine\\Bulk": "src/"
+            "ZF\\Apigility\\Doctrine\\Bulk\\": "src/"
         }
     }
 }

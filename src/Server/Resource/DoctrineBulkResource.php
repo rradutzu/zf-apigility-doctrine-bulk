@@ -29,6 +29,7 @@ class DoctrineBulkResource extends DoctrineResource
      */
     public function create($data)
     {
+        $data = (array) $data;
         if (array_values($data) === $data) {
             // this is a POST request which creates a collection
             $return = new ArrayCollection();

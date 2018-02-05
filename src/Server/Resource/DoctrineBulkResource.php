@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Instantiator\InstantiatorInterface;
 use \ZF\Apigility\Doctrine\Server\Resource\DoctrineResource;
 use ZF\ApiProblem\ApiProblem;
+use ZF\Hal\Plugin\Hal;
 
 class DoctrineBulkResource extends DoctrineResource
 {
@@ -49,7 +50,10 @@ class DoctrineBulkResource extends DoctrineResource
             }
             $this->getObjectManager()->getConnection()->commit();
 
-            return $return;
+            $halPlugin = new Hal();
+            $halCollection = $halPlugin->createCollection($return, $this->getEvent()->getRouteMatch()->getMatchedRouteName());
+
+            return $halCollection;
         } else {
             // this is a post request which creates an entity
             return parent::create($data);

@@ -1,5 +1,6 @@
 {
     "name": "rradutzu/zf-apigility-doctrine-bulk",
+    "version": "1.2.0",
     "description": "Apigility Doctrine module which enables POST-ing collections",
     "keywords": [
         "api",

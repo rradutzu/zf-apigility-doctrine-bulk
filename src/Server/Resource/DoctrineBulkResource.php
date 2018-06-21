@@ -4,12 +4,15 @@ namespace ZF\Apigility\Doctrine\Bulk\Server\Resource;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Instantiator\InstantiatorInterface;
+use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
 use \ZF\Apigility\Doctrine\Server\Resource\DoctrineResource;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Hal\Plugin\Hal;
 
 class DoctrineBulkResource extends DoctrineResource
 {
+    const EVENT_POST_FLUSH = 'doctrine.apigility.post-flush';
+
     /** @var null|InstantiatorInterface  */
     private $entityFactory;
 
@@ -39,14 +42,20 @@ class DoctrineBulkResource extends DoctrineResource
             foreach ($data as $row) {
                 $row = (array)$row;
                 // execute create
-                $result = parent::create($row);
+                $entity = parent::create($row);
 
-                if ($result instanceof ApiProblem) {
+                if ($entity instanceof ApiProblem) {
                     $this->getObjectManager()->getConnection()->rollBack();
 
-                    return $result;
+                    return $entity;
                 }
-                $return->add($result);
+
+                $results = $this->triggerDoctrineEvent(self::EVENT_POST_FLUSH, $entity, $data);
+                if ($results->last() instanceof ApiProblem) {
+                    return $results->last();
+                }
+
+                $return->add($entity);
             }
             $this->getObjectManager()->getConnection()->commit();
 
@@ -55,8 +64,27 @@ class DoctrineBulkResource extends DoctrineResource
 
             return $halCollection;
         } else {
+            $this->getObjectManager()->getConnection()->beginTransaction();
+
             // this is a post request which creates an entity
-            return parent::create($data);
+            $entity = parent::create($data);
+
+            if ($entity instanceof ApiProblem) {
+                $this->getObjectManager()->getConnection()->rollBack();
+
+                return $entity;
+            }
+
+            $results = $this->triggerDoctrineEvent(self::EVENT_POST_FLUSH, $entity, $data);
+            if ($results->last() instanceof ApiProblem) {
+                $this->getObjectManager()->getConnection()->rollback();
+
+                return $results->last();
+            }
+
+            $this->getObjectManager()->getConnection()->commit();
+
+            return $entity;
         }
     }
 }

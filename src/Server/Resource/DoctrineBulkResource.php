@@ -4,7 +4,6 @@ namespace ZF\Apigility\Doctrine\Bulk\Server\Resource;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Instantiator\InstantiatorInterface;
-use ZF\Apigility\Doctrine\Server\Event\DoctrineResourceEvent;
 use \ZF\Apigility\Doctrine\Server\Resource\DoctrineResource;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Hal\Plugin\Hal;

@@ -49,14 +49,14 @@ class DoctrineBulkResource extends DoctrineResource
                     return $entity;
                 }
 
-                $results = $this->triggerDoctrineEvent(self::EVENT_POST_FLUSH, $entity, $data);
-                if ($results->last() instanceof ApiProblem) {
-                    return $results->last();
-                }
-
                 $return->add($entity);
             }
             $this->getObjectManager()->getConnection()->commit();
+
+            $results = $this->triggerDoctrineEvent(self::EVENT_POST_FLUSH, $entity, $data);
+            if ($results->last() instanceof ApiProblem) {
+                return $results->last();
+            }
 
             $halPlugin = new Hal();
             $halCollection = $halPlugin->createCollection($return, $this->getEvent()->getRouteMatch()->getMatchedRouteName());
